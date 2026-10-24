@@ -1,0 +1,161 @@
+{
+  "name": "support request notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Submit a Support Request",
+        "formDescription": "let us know what's wrong and how urgent it is.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Describe the issue",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Is this Urgent?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "yes"
+                  },
+                  {
+                    "option": "no"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "2ef7201a-9b28-4a09-a89f-a95b6bd1e757",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b1729deb-7e04-4d8a-a5b1-9a539baa3f98",
+              "leftValue": "={{ $json['Is this Urgent?'] }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "6c9aaa69-5ebe-4653-86fb-756a5e6410f6",
+      "name": "Is it urgent?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "4f41285b-e6a9-4b4e-8c62-298de7af2dd0",
+      "name": "Not urgent"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_SERVER_ID",
+          "mode": "list",
+          "cachedResultName": "Your Server",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_SERVER_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_DISCORD_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "support-alerts",
+          "cachedResultUrl": "https://discord.com/channels/YOUR_DISCORD_SERVER_ID/YOUR_DISCORD_CHANNEL_ID"
+        },
+        "content": "=Urgent Support Request!\nIssue: {{ $json['Describe the issue'] }}\nUrgent: {{ $json['Is this Urgent?'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "94fb226f-fefa-47e7-8960-d8f6395ab046",
+      "name": "Send a message",
+      "credentials": {
+        "discordBotApi": {
+          "id": "REPLACE_DISCORD_CREDENTIAL_ID",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Is it urgent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it urgent?": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not urgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "id": "",
+  "tags": []
+}
